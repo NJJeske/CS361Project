@@ -20,8 +20,7 @@ public class IND implements Run{
 	
 public IND(){}
 	
-	public void DNF()
-	{
+	public void DNF() {
 		if(!qRunning.isEmpty())
 		{
 			competitor c = qRunning.remove();
@@ -29,15 +28,18 @@ public IND(){}
 			qFinished.add(c);
 		}
 	}
-
+	
+	/*  Add competitor to start Queue with specified ID
+	 */
 	public void addCompetitor(int ID){
 		qStart.add(new competitor(ID));
 		counter++;
 	}
-
-	public void triggered(channel c, time t){
-
-
+	
+	/*  Trigger channel c with time t
+	 *  Channel 1 is a start, Channel 2 is a finish
+	 */ 
+	public void triggered(channel c, time t) {
 		int chNum = c.getChannelNumber();
 		switch(chNum)
 		{
@@ -50,7 +52,10 @@ public IND(){}
 			default:
 		}
 	}
-	                                                                                         
+	
+	/*  Create string with all Competitiors and their finish (or DNF) times 
+	 *  Return generated string
+	 */
 	public String print(){
 		String run="";
 		
@@ -65,6 +70,8 @@ public IND(){}
 		return run;
 	}
 	
+	/*  Start with given channel and time.  Start should be on Odd Channel number
+	 */
 	public void start( time t, channel c){ 
 		if(c.getChannelNumber() % 2 == 1 && c.state())	
 		{
@@ -77,6 +84,9 @@ public IND(){}
 			}
 		}
 	}
+	
+	/*   Finish with given channel and time. Finish should be on Even channel number
+	 */
 	public void finish(time t, channel c)
 	{
 		if(c.getChannelNumber() % 2 == 0 && c.state())
@@ -93,6 +103,9 @@ public IND(){}
 			}
 		}
 	}
+	
+	/*  Cancel the current run
+	 */
 	public void cancel(){
 		if(!qStart.isEmpty())return;
 		
@@ -105,24 +118,33 @@ public IND(){}
 		qStart.peek().setStart(null);
 		System.out.println(qStart.peek().getID() + " cancelled");
 	}
+	
 	@Override
 	public String toString(){
 		return "IND";
 	}
+	
+	/*  Return Queue of finished competitors
+	 */
 	@Override
 	public Queue<competitor> getRun() {
-		// TODO Auto-generated method stub
 		return qFinished;
 	}
+	
 	public competitor getCompetitorWhoTriggered(){
 		return whoTriggered;
 	}
+	
 	public void setCompetitorWhoTriggered(){
 		 whoTriggered = null;
 	}
+	
 	public boolean isLast(){
 		return counter == 0;
 	}
+	
+	/*  Swap position of the next 2 competitors to finish
+	 */
 	public void swap(){
 		if(qRunning.size() < 2){
 		System.out.println("Not enough active racers");
