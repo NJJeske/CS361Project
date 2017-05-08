@@ -11,19 +11,25 @@ public class PARAIND implements Run {
 	private Queue<competitor> pFinished = new LinkedList<competitor>();
 	
 	private competitor a,b;
-	public PARAIND(){
-		
+	public PARAIND(){	
 	}
 	
+	/*  Next competitor is marked DNF
+	 */
 	public void DNF(){
 		competitor x;
 		if(pRunning.size() > 1) {x = pRunning.remove(); x.DNF(); pFinished.add(x);}
 	}
 	
+	/*  Add competitor to starting Queue with ID
+	 */
 	public void addCompetitor(int ID){
 		pStart.add(new competitor(ID));
 	}
-
+	
+	/*  Trigger channel c with time t
+	 *  Odd Channels start, Even channels finish
+	 */
 	public void triggered(channel c, time t){
 		int chNum = c.getChannelNumber();
 		switch(chNum)
@@ -39,6 +45,9 @@ public class PARAIND implements Run {
 			default:
 		}
 	}
+	
+	/*   Generate and return string with each racer's ID and finish time
+	 */
 	public String print(){
 		String run="";
 		
@@ -50,10 +59,14 @@ public class PARAIND implements Run {
 		
 		return run;
 	}
+	
 	@Override
 	public String toString(){
 		return "PARAIND";
 	}
+	
+	/*  Cancel current Run
+	 */
 	@Override
 	public void cancel() {
 		if(pRunning.size() > 2)
@@ -67,17 +80,27 @@ public class PARAIND implements Run {
 			pStart = temp;
 		}
 	}
+	
+	/*  Finish with specified time and channel. Channel number should be Even
+	 */
 	@Override
 	public void finish(time t, channel channel) {
 		if(channel.getChannelNumber() == 2){ a = pRunning.remove(); a.setFinish(t); a.calculateElapsed(); pFinished.add(a); }
-		if(channel.getChannelNumber() == 4){ b = pRunning.remove(); b.setFinish(t); b.calculateElapsed(); pFinished.add(b); }
+		else if(channel.getChannelNumber() == 4){ b = pRunning.remove(); b.setFinish(t); b.calculateElapsed(); pFinished.add(b); }
+		else {System.out.println("Invalid finish channel");}
 	}
 
+	/*  Start with given time and channel.  Channel number should be ODD
+	 */
 	@Override
 	public void start(time t, channel channel) {
 		if(channel.getChannelNumber() == 1){ a = pStart.remove(); a.setStart(t); pRunning.add(a);}
-		if(channel.getChannelNumber() == 3){ b = pStart.remove(); b.setStart(t); pRunning.add(b);}
+		else if(channel.getChannelNumber() == 3){ b = pStart.remove(); b.setStart(t); pRunning.add(b);}
+		else { System.out.println("Invalid start channel");}
 	}
+	
+	/*  Return Queue of finished competitors
+	 */
 	@Override
 	public Queue getRun() {
 		// TODO Auto-generated method stub
