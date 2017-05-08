@@ -1,4 +1,4 @@
-package sprint1;
+package sprint4;
 
 import java.awt.event.ActionListener;
 
@@ -7,8 +7,9 @@ import java.awt.event.ActionListener;
  */
 interface sensor extends Runnable{
 	
-	//public void trigger();
+	public void trigger();
 	public boolean isHooked();
 	public void plug(channel c);
 	public void unplug(channel c);
 }
+

@@ -1,4 +1,4 @@
-package sprint1;
+package sprint4;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -11,9 +11,12 @@ public class PARAIND implements Run {
 	private Queue<competitor> pFinished = new LinkedList<competitor>();
 	
 	private competitor a,b;
+	private display d ;
 	public PARAIND(){	
 	}
-	
+	public PARAIND(display d){
+		this.d = d;
+	}
 	/*  Next competitor is marked DNF
 	 */
 	public void DNF(){
@@ -55,7 +58,7 @@ public class PARAIND implements Run {
 			if(p.isDNF())
 				run += "competitor: " + p.getID() + " did not finish" + '\n';
 			else
-				run += p.getID() + " " + p.getElapsed().getTime() + '\n';
+				run += p.getID() + " " + p.getElapsed().toString() + '\n';
 		
 		return run;
 	}
@@ -85,11 +88,10 @@ public class PARAIND implements Run {
 	 */
 	@Override
 	public void finish(time t, channel channel) {
-		if(channel.getChannelNumber() == 2){ a = pRunning.remove(); a.setFinish(t); a.calculateElapsed(); pFinished.add(a); }
-		else if(channel.getChannelNumber() == 4){ b = pRunning.remove(); b.setFinish(t); b.calculateElapsed(); pFinished.add(b); }
-		else {System.out.println("Invalid finish channel");}
+		if(!pRunning.isEmpty())
+			if(channel.getChannelNumber() == 2){ a = pRunning.remove(); a.setFinish(t); a.calculateElapsed(); sendDataToDisplay(a); pFinished.add(a); }
+			else if(channel.getChannelNumber() == 4){ b = pRunning.remove(); b.setFinish(t); b.calculateElapsed(); sendDataToDisplay(b); pFinished.add(b); }
 	}
-
 	/*  Start with given time and channel.  Channel number should be ODD
 	 */
 	@Override
@@ -102,7 +104,7 @@ public class PARAIND implements Run {
 	/*  Return Queue of finished competitors
 	 */
 	@Override
-	public Queue getRun() {
+	public Queue<competitor> getRun() {
 		// TODO Auto-generated method stub
 		return pFinished;
 	}
@@ -112,10 +114,11 @@ public class PARAIND implements Run {
 	public competitor getB(){
 		return b;
 	}
-	public void setA(){
-		a = null;
-	}
-	public void setB(){
-		b = null;
+	private void sendDataToDisplay(competitor x)
+	{
+		if(!pRunning.isEmpty())
+			d.sendData(x.getID() + " " + x.getElapsed().toString() + "<R>");
+		else
+			d.sendData(x.getID() + " " + x.getElapsed().toString() + "<F>");
 	}
 }

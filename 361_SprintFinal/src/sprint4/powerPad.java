@@ -1,4 +1,4 @@
-package sprint1;
+package sprint4;
 
 public class powerPad implements pad {
 	private chronotimer timer;
@@ -12,11 +12,12 @@ public class powerPad implements pad {
 		else timer.turnOff();
 		
 	}
+	/**
+	 * not implemented
+	 * @return 0    
+	 */
 	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-	}
+	public int push2() {return 0;}
 
 
 }

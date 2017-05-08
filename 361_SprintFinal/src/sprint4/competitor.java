@@ -1,4 +1,4 @@
-package sprint1;
+package sprint4;
 /*
  * this class represents the racers in a race/run. they have their owwn
  * start, finish and elapsed time with ID. methods are mainly setters and
@@ -52,7 +52,7 @@ public class competitor {
 	}
 	public String toString(){
 		if(!DNF)
-		return ID + " " + elapsed.getTime();
+		return ID + " " + elapsed.toString();
 		else
 			return ID + " " + "DNF";
 		

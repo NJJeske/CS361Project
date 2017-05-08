@@ -1,4 +1,4 @@
-package sprint1;
+package sprint4;
 
 /**
  * This class represents channel ports on the timer.

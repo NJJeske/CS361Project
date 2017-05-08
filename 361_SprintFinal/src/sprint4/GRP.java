@@ -1,4 +1,4 @@
-package sprint1;
+package sprint4;
 
 import java.util.Collection;
 import java.util.Vector;
@@ -11,11 +11,14 @@ public class GRP extends runAbstract {
 	int n = 0; // position of next racer to set ID of
 	private time startTime;
 	boolean lock;
+	private display d ;
 
 	public GRP() {
 
 	}
-
+	public GRP(display d) {
+		this.d = d;
+	}
 	/*  Assign ID to a finished Competitor
 	 */
 	@Override
@@ -53,7 +56,7 @@ public class GRP extends runAbstract {
 			if (p.isDNF())
 				run += "competitor: " + p.getID() + " did not finish" + '\n';
 			else
-				run += p.getID() + " " + p.getElapsed().getTime() + '\n';
+				run += p.getID() + " " + p.getElapsed().toString() + '\n';
 
 		// run += e.getID() + '\n';
 		// System.out.println(run);
@@ -124,5 +127,9 @@ public class GRP extends runAbstract {
 			return vFinished.lastElement();
 		return null;
 	}
+	private void sendDataToDisplay(competitor x)
+	{
+		d.sendData(x.getID() + " " + x.getElapsed().toString() + "<R>");
 
+	}
 }

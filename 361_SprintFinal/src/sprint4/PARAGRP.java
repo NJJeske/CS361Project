@@ -1,4 +1,4 @@
-package sprint1;
+package sprint4;
 
 import java.util.Collection;
 import java.util.Vector;
@@ -26,7 +26,7 @@ public class PARAGRP implements Run{
 			if(p.isDNF())
 				run += "competitor: " + p.getID() + " did not finish" + '\n';
 			else
-				run += p.getID() + " " + p.getElapsed().getTime() + '\n';
+				run += p.getID() + " " + p.getElapsed().toString() + '\n';
 		return run;
 	}
 	
@@ -51,7 +51,7 @@ public class PARAGRP implements Run{
 	}
 	
 	/*  Finish specified channel with specified time.
-	 *  Precondintion: Run must have a start time
+	 *  Precondition: Run must have a start time
 	 */
 	@Override
 	public void finish(time t, channel channel) {

@@ -1,6 +1,8 @@
-package sprint1;
+package sprint4;
 
 import java.util.ArrayList;
+
+import org.omg.CORBA.SystemException;
 /**
  *  chronotimer 
  *     
@@ -11,12 +13,13 @@ public class chronotimer {
 	private boolean powerState = false;
 	private boolean runState;
 	private updateServer client;
-	
+	private printer printer;
+	private display display;
+	private keyPad keypad;
 	private Run run;
 	private String event;
 	ArrayList<Run> allRuns = new ArrayList<Run>();
 	
-	private ChronoGUI GUI;
 	channel[] ch;
 	
 	/*
@@ -31,10 +34,11 @@ public class chronotimer {
 	
 	public chronotimer()
 	{
-		GUI = new ChronoGUI(this);
+		keypad = new keyPad();
+		display = new display(this);
+		printer = new printer();
 		client = new updateServer();
-		run =   new IND(); // default event
-		runState = true;				// default state (there are no new runs)
+		runState = false;				// default state (there are no new runs)
 		sysTime = new time();		// default time
 	//initializE channels
 		ch = new channel[10];			
@@ -94,9 +98,11 @@ public class chronotimer {
 	public void createRun(){
 		if(!runState)
 		{
-			if(event.equals("IND")) 	run = new IND();
-			if(event.equals("PARAIND"))	run = new PARAIND();
-			if(event.equals("GRP"))		run = new GRP();
+			if(event.equals("IND")) 	run = new IND(display);
+			if(event.equals("PARAIND"))	run = new PARAIND(display);
+			if(event.equals("GRP"))		run = new GRP(display);
+			if(event.equals("PARAGRP"))	run = new PARAGRP();
+
 			
 			runState = true;
 		}
@@ -106,7 +112,7 @@ public class chronotimer {
 	* 
 	******/
 	public void endRun(){
-			//client.update(run);
+			client.update(run);
 
 		if(runState)
 		{
@@ -166,29 +172,7 @@ public class chronotimer {
 		// TODO Auto-generated method stub
 		sysTime.update();
 		run.triggered(c, sysTime);
-		if(run instanceof IND){
-			competitor x = ((IND) run).getCompetitorWhoTriggered();
-			if(c.getChannelNumber()%2 == 0 && x != null && !((IND)run).isLast() && !x.isDNF())
-				GUI.displayText(x.getID() + " " + x.getElapsed().getTime() + "<R>");
-			else if(((IND)run).isLast() && x != null){
-				GUI.displayText(x.getID() + " " + x.getElapsed().getTime() + "<F>");
-				((IND)run).setCompetitorWhoTriggered();
-			}
-		}
-		else if(run instanceof PARAIND){
-		//todo
-			competitor a = ((PARAIND) run).getA();
-			competitor b = ((PARAIND) run).getB();
-			if(a != null) if(a.getFinish() != null){ GUI.displayText(a.getID() + " " + a.getElapsed().getTime() + "<R>");  ((PARAIND) run).setA();}
-				if(b != null) if(b.getFinish() != null){
-					GUI.displayText(b.getID() + " " + b.getElapsed().getTime() + "<R>"); ((PARAIND) run).setB();}
-		}
-		else if(run instanceof GRP){
-			//todo
-			competitor x = ((GRP) run).getLastCompetitor();
-			if(x != null)
-				GUI.displayText(x.getID() + " " + x.getElapsed().getTime() + "<R>");
-			}
+	
 	}
 //	/*****
 //	* set the system time 
@@ -218,9 +202,14 @@ public class chronotimer {
 	
 	public void NUM(int ID){
 		run.addCompetitor(ID);
-		GUI.displayText(""+ID + " <" + sysTime.getTime()+">");
+		///GUI.displayText(""+ID + " <" + sysTime.getTime()+">");
 	}
 	public time getTime(){
+		sysTime.update();
 		return sysTime;
 	}
+	public printer getPrinter(){
+	return printer;
+	}
 }
+
