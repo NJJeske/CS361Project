@@ -27,6 +27,7 @@ public class PARAGRP implements Run{
 				run += "competitor: " + p.getID() + " did not finish" + '\n';
 			else
 				run += p.getID() + " " + p.getElapsed().getTime() + '\n';
+		return run;
 	}
 	
 	/*  End the run.  All unfinished racer are marked as DNF
