@@ -9,17 +9,28 @@ public class PARAGRP implements Run{
 	private time startTime;
 	private boolean DNF = false;
 	
+	/*  Set DNF flag to apply to next finishing competitor
+	 */
 	@Override
-	public void DNF() {
+	public void DNF() {	
 		DNF = true;
 	}
-
+	
+	/*  For each finished (or DNF) competitor,
+	 *  add their racer ID and finish time to a string
+	 */
 	@Override
 	public String print() {
-		// TODO Auto-generated method stub
-		return null;
+		String run = "";
+		for (competitor p : vFinished) 
+			if(p.isDNF())
+				run += "competitor: " + p.getID() + " did not finish" + '\n';
+			else
+				run += p.getID() + " " + p.getElapsed().getTime() + '\n';
 	}
-
+	
+	/*  End the run.  All unfinished racer are marked as DNF
+	 */
 	@Override
 	public void cancel() {
 		for(int i=0; i< vStart.size(); i++){
@@ -28,6 +39,8 @@ public class PARAGRP implements Run{
 		}
 	}
 
+	/*  Trigger channel c with time t
+	 */
 	@Override
 	public void triggered(channel c, time t) {
 		if(startTime == null)
@@ -35,7 +48,10 @@ public class PARAGRP implements Run{
 		else
 			finish(t, c);
 	}
-
+	
+	/*  Finish specified channel with specified time.
+	 *  Precondintion: Run must have a start time
+	 */
 	@Override
 	public void finish(time t, channel channel) {
 		int ind = channel.getChannelNumber() -1;
@@ -50,7 +66,9 @@ public class PARAGRP implements Run{
 		}
 		DNF = false;
 	}
-
+	
+	/*  Start event.  Should be triggered on channel 1.
+	 */
 	@Override
 	public void start(time t, channel channel) {
 		if(channel.getChannelNumber() != 1)
@@ -60,12 +78,17 @@ public class PARAGRP implements Run{
 		}
 		
 	}
-
+	
+	/*  Return vector of finished racers
+	 */
 	@Override
 	public Vector<competitor> getRun() {
 		return vFinished;
 	}
-
+	
+	/*  Add competitor to start with given ID
+	 *  Max capacity: 8 competitors
+	 */
 	@Override
 	public void addCompetitor(int ID) {
 		if(vStart.size() > 7) 
