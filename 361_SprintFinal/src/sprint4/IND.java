@@ -18,7 +18,6 @@ public class IND implements Run{
 	private Vector<competitor> qFinished = new Vector<competitor>();
 	private Vector<Integer> registeredNumbers = new Vector<Integer>();
 
-	
 	private display display;
 	public IND(){}
 	public IND(display d){display = d;}
@@ -38,10 +37,11 @@ public class IND implements Run{
 		{
 			registeredNumbers.add(ID);
 			qStart.add(new competitor(ID));
+			display.sendStartData(getFirstThree());
 			return ;
 		}
+		
 	}
-
 	public void triggered(channel c, time t){
 		int chNum = c.getChannelNumber();
 		switch(chNum)
@@ -71,12 +71,14 @@ public class IND implements Run{
 		return run;
 	}
 	
+
 	public void start( time t, channel c){ 
 		if(c.getChannelNumber() % 2 == 1 && c.state())	
 		{
 			if(!qStart.isEmpty()) 
 			{
 				competitor w = qStart.remove(0);
+				display.sendStartData(getFirstThree());
 				w.setStart(t);
 				qRunning.add(w);
 			}
@@ -99,13 +101,7 @@ public class IND implements Run{
 			}
 		}
 	}
-	private void sendDataToDisplay(competitor x)
-	{
-		if(!qRunning.isEmpty())
-			display.sendData(x.getID() + " " + x.getElapsed().toString() + "<R>");
-		else
-			display.sendData(x.getID() + " " + x.getElapsed().toString() + "<F>");
-	}
+
 	public void cancel(){
 		if(qRunning.isEmpty())return;
 		qStart.add(0,qRunning.remove(0));
@@ -122,7 +118,30 @@ public class IND implements Run{
 	public competitor getLastCompetitor(){
 		return qFinished.lastElement();
 	}
+	private void sendDataToDisplay(competitor x)
+	{
+		String arr[] = getFirstThree().split(" ");
+		
+		
+		
+		if(!qRunning.isEmpty())
+			display.sendData(x.getID() + " " + x.getElapsed().toString() + "<R>");
+		else
+			display.otherbox(x.getID() + " " + x.getElapsed().toString() + "<F>");
+	}
+	private String getFirstThree(){
+		String str="";
+		int j = 0;
+		
+		if(qStart.size() == 0) return "{ empty, empty, empty }";
+		if(qStart.size() == 1)  return "{ " + qStart.get(0).getID() + ", empty, empty }";
+		if(qStart.size() == 2)  return "{ " + qStart.get(0).getID() + ", " + qStart.get(1).getID() + ", empty }";
+		if(qStart.size() == 3)  return "{ " + qStart.get(0).getID() + ", " + qStart.get(1).getID() + ", " +  qStart.get(2).getID()+  "}";
+		return "{ " + qStart.get(0).getID() + ", " + qStart.get(1).getID() + ", " +  qStart.get(2).getID()+  "}";
+		
+	}
 	
+
 	public void swap(){
 		if(qRunning.size() < 2){
 		System.out.println("Not enough active racers");

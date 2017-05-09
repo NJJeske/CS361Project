@@ -1,6 +1,7 @@
 package sprint4;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.omg.CORBA.SystemException;
 /**
@@ -16,7 +17,7 @@ public class chronotimer {
 	private printer printer;
 	private display display;
 	private keyPad keypad;
-	private Run run;
+	private Run run, prev;
 	private String event;
 	ArrayList<Run> allRuns = new ArrayList<Run>();
 	
@@ -119,7 +120,16 @@ public class chronotimer {
 			allRuns.add(run);
 			run = null;
 			runState=false;
+			
+			prev = allRuns.get(allRuns.size()-1);
+			if(prev instanceof GRP)
+			{
+				display.sendData( ((competitor)((Vector)prev.getRun()).lastElement()).getID() + 
+						((competitor)((Vector)prev.getRun()).lastElement()).getFinish().toString() +  
+						"<F>" );
+			}
 		}
+		
 	}
 	public void CONN(int channelNumber, sensor s){
 		ch[channelNumber].setSensor(s);

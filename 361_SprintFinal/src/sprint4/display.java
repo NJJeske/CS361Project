@@ -24,4 +24,12 @@ public class display {
 	{
 		gui.displayText(data);
 	}
+	public void sendStartData(String start)
+	{
+		gui.updateStart(start);
+	}
+	public void otherbox(String data)
+	{
+		gui.otherBox(data);
+	}
 }

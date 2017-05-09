@@ -15,6 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
@@ -24,8 +25,8 @@ import javax.swing.ScrollPaneConstants;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Timer;
 import java.awt.event.ActionEvent;
-
 public class ChronoGUI extends JFrame {
 	
 	/**
@@ -34,8 +35,9 @@ public class ChronoGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	//private static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static final int WIDTH = 850;
-	private static final int HEIGHT = 650;	
+	private static final int HEIGHT = 650;
 	private chronotimer t;
+	private Timer timer;
 	
 	private JRadioButton[] channelSelection = new JRadioButton[8];
 	//private JRadioButton[] chPorts = new JRadioButton[8];
@@ -55,7 +57,9 @@ public class ChronoGUI extends JFrame {
 	
 	JPanel frame2 = new JPanel();
 	
-	
+	private JTextField field = new JTextField();
+	private JTextField field2 = new JTextField();
+
 	
     JPanel pane2= new JPanel() ,pane3 = new JPanel() ;
 	
@@ -142,7 +146,7 @@ public class ChronoGUI extends JFrame {
         		if(t.powerState()){
         			if(t.getPrinter().state())
         			{
-        				mainArea.setText(mainArea.getText().concat(t.getRun().print() + '\n'));
+        				printerArea.setText(printerArea.getText().concat(t.getRun().print() + '\n'));
         			}
         		}
         	}
@@ -172,15 +176,13 @@ public class ChronoGUI extends JFrame {
         });
         functions.add(btnTime);
         
-
-        
         JButton btnNewRun = new JButton("New Run");
         btnNewRun.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		if(t.powerState()){
         			 if(t.getRun() == null){
 		        		t.createRun();
-						printerArea.setText(printerArea.getText().concat("creating a new run" + '\n'));
+		        		printerArea.setText(printerArea.getText().concat("creating a new run" + '\n'));
         			 }else
         				 printerArea.setText(printerArea.getText().concat("run already exists. end it first" + '\n'));
         		}
@@ -217,7 +219,7 @@ public class ChronoGUI extends JFrame {
 			public void itemStateChanged(ItemEvent e) {
 				// TODO Auto-generated method stub
 				if(e.getStateChange() == ItemEvent.SELECTED && t.powerState())
-				printerArea.setText(printerArea.getText().concat("Event Type: IND" + '\n'));
+					printerArea.setText(printerArea.getText().concat("Event Type: IND" + '\n'));
 				t.setEvent("IND");
 			}
         	
@@ -408,16 +410,35 @@ public class ChronoGUI extends JFrame {
 	{
         //---------------JTextArea
         
-        printerArea = new JTextArea("");
-        printerArea.setEditable(false);
+        mainArea = new JTextArea("");
+        mainArea.setEditable(false);
         
         printerArea = new JTextArea();
         printerArea.setEditable(false);
 
+        field.setBounds(175, 245, 240, 25);
+        Interface.add(field);
+        
+        field2.setBounds(175, 420, 240, 25);
+        Interface.add(field2);
+        
+        Label lblStartQueue = new Label("Start Queue: ");
+        Label lblMostRecentFinish = new Label("Most recent Finish: ");
+        Label lblRunningTime = new Label("Runnning Time: ");
+
+        lblStartQueue.setBounds(100,245,80,20);
+        Interface.add(lblStartQueue);
+        
+        lblMostRecentFinish.setBounds(60,420,110,20);
+        Interface.add(lblMostRecentFinish);
+        
+        lblRunningTime.setBounds(80,270,95,20);
+        Interface.add(lblRunningTime);
+
 
     //------------JScrollPanes
     
-        JScrollPane mainBar = new JScrollPane(printerArea);
+        JScrollPane mainBar = new JScrollPane(mainArea);
         mainBar.setBounds(175, 270, 239, 150);
         mainBar.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         Interface.add(mainBar);
@@ -528,7 +549,7 @@ public class ChronoGUI extends JFrame {
 				// TODO Auto-generated method stub
 				if(t.powerState() && !numPad.getText().isEmpty() && numPad.getText().matches(("[0-9]+") ) && t.getRun() != null){
 					t.getRun().addCompetitor(Integer.parseInt(numPad.getText()));
-					printerArea.setText(printerArea.getText().concat(numPad.getText() + "<" + t.getTime().toString()) + ">" + '\n');
+					printerArea.setText(printerArea.getText().concat("added " + numPad.getText() + '\n'));
 					//clear numPad
 				}
 				numPad.setText("");
@@ -597,11 +618,11 @@ public class ChronoGUI extends JFrame {
 					index = i+1;
 			
 				if(e.getStateChange() == ItemEvent.SELECTED && t.powerState()){
-					//printerArea.setText(printerArea.getText().concat("channel " + index + " enabled" + '\n'));
+					//mainArea.setText(mainArea.getText().concat("channel " + index + " enabled" + '\n'));
 					t.channelPads[1][index].push();
 				}
 				else if(e.getStateChange() == ItemEvent.DESELECTED && t.powerState()){
-					//printerArea.setText(printerArea.getText().concat("channel " + index + " disabled" + '\n'));
+					//mainArea.setText(mainArea.getText().concat("channel " + index + " disabled" + '\n'));
 					t.channelPads[1][index].push();
 				}
 		}
@@ -616,7 +637,7 @@ public class ChronoGUI extends JFrame {
 			if(t.powerState() && t.ch[x].state())
 			{
 				t.channelPads[0][x].push();
-//				printerArea.setText(printerArea.getText().concat("triggered  ! " + '\n'
+//				mainArea.setText(mainArea.getText().concat("triggered  ! " + '\n'
 //				));
 			}
 		}
@@ -632,7 +653,17 @@ public class ChronoGUI extends JFrame {
 		}
 	}
 
-	public void displayText(String str){
+	public void displayText(String str) {
 		printerArea.setText(printerArea.getText().concat(str + '\n'));
 	}
+	
+	public void updateStart(String str)
+	{
+		field.setText(str);
+	}
+	public void otherBox(String str)
+	{
+		mainArea.setText(mainArea.getText().concat(str + '\n'));
+	}
+	
 }

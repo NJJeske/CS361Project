@@ -84,8 +84,10 @@ public class GRP extends runAbstract {
 		}
 		vFinished.add(new competitor(t, i++));
 		if (!vFinished.lastElement().isDNF()) {
+			
 			vFinished.lastElement().setStart(startTime);
 			vFinished.lastElement().calculateElapsed();
+			sendDataToDisplay(vFinished.lastElement());
 		}
 
 	}
@@ -130,6 +132,5 @@ public class GRP extends runAbstract {
 	private void sendDataToDisplay(competitor x)
 	{
 		d.sendData(x.getID() + " " + x.getElapsed().toString() + "<R>");
-
 	}
 }

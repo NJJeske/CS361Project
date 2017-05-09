@@ -3,12 +3,13 @@ package sprint4;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Vector;
 
 public class PARAIND implements Run {
 	
-	private Queue<competitor> pStart = new LinkedList<competitor>();
-	private Queue<competitor> pRunning = new LinkedList<competitor>();
-	private Queue<competitor> pFinished = new LinkedList<competitor>();
+	private Vector<competitor> pStart = new Vector<competitor>();
+	private Vector<competitor> pRunning = new Vector<competitor>();
+	private Vector<competitor> pFinished = new Vector<competitor>();
 	
 	private competitor a,b;
 	private display d ;
@@ -21,13 +22,15 @@ public class PARAIND implements Run {
 	 */
 	public void DNF(){
 		competitor x;
-		if(pRunning.size() > 1) {x = pRunning.remove(); x.DNF(); pFinished.add(x);}
+		if(pRunning.size() > 1) {x = pRunning.remove(0); x.DNF(); pFinished.add(x);}
 	}
 	
 	/*  Add competitor to starting Queue with ID
 	 */
 	public void addCompetitor(int ID){
 		pStart.add(new competitor(ID));
+		d.sendStartData(getFirstPair());
+		
 	}
 	
 	/*  Trigger channel c with time t
@@ -74,13 +77,13 @@ public class PARAIND implements Run {
 	public void cancel() {
 		if(pRunning.size() > 2)
 		{
-			competitor toCancel1= pRunning.remove(), toCancel2 = pRunning.remove() ;
+			competitor toCancel1= pRunning.remove(0), toCancel2 = pRunning.remove(0) ;
 			Queue<competitor> temp = new LinkedList<competitor>();
 			temp.add(toCancel1); temp.add(toCancel2);
 			
 			for(competitor old : pStart)
 				temp.add(old);
-			pStart = temp;
+			//pStart = temp;
 		}
 	}
 	
@@ -89,22 +92,48 @@ public class PARAIND implements Run {
 	@Override
 	public void finish(time t, channel channel) {
 		if(!pRunning.isEmpty())
-			if(channel.getChannelNumber() == 2){ a = pRunning.remove(); a.setFinish(t); a.calculateElapsed(); sendDataToDisplay(a); pFinished.add(a); }
-			else if(channel.getChannelNumber() == 4){ b = pRunning.remove(); b.setFinish(t); b.calculateElapsed(); sendDataToDisplay(b); pFinished.add(b); }
+			if(channel.getChannelNumber() == 2)
+			{ a = pRunning.remove(0);
+			a.setFinish(t);
+			a.calculateElapsed();
+			sendDataToDisplay(a);
+			pFinished.add(a); }
+			else if(channel.getChannelNumber() == 4)
+			{ 
+				b = pRunning.remove(0);
+				b.setFinish(t);
+				b.calculateElapsed();
+				sendDataToDisplay(b);
+				pFinished.add(b); 
+			}
 	}
 	/*  Start with given time and channel.  Channel number should be ODD
 	 */
 	@Override
 	public void start(time t, channel channel) {
-		if(channel.getChannelNumber() == 1){ a = pStart.remove(); a.setStart(t); pRunning.add(a);}
-		else if(channel.getChannelNumber() == 3){ b = pStart.remove(); b.setStart(t); pRunning.add(b);}
+		if(channel.getChannelNumber() == 1)
+		{ 
+			a = pStart.remove(0); 
+			d.sendStartData(getFirstPair(channel));
+			a.setStart(t); 
+			pRunning.add(a);
+			
+		}
+		else if(channel.getChannelNumber() == 3)
+		{
+			b = pStart.remove(0); 
+			d.sendStartData(getFirstPair(channel));
+			b.setStart(t); 
+			pRunning.add(b);
+			
+		}
 		else { System.out.println("Invalid start channel");}
 	}
 	
 	/*  Return Queue of finished competitors
 	 */
 	@Override
-	public Queue<competitor> getRun() {
+	public Vector<competitor> getRun() {
 		// TODO Auto-generated method stub
 		return pFinished;
 	}
@@ -116,9 +145,27 @@ public class PARAIND implements Run {
 	}
 	private void sendDataToDisplay(competitor x)
 	{
+		
 		if(!pRunning.isEmpty())
-			d.sendData(x.getID() + " " + x.getElapsed().toString() + "<R>");
+			d.sendData( x.getID() + " " + x.getElapsed().toString() + "<R>" );
 		else
 			d.sendData(x.getID() + " " + x.getElapsed().toString() + "<F>");
+	}
+	private String getFirstPair(channel... c){
+		String str="";
+		int j = 0;
+		
+		if(pStart.size() == 0) return "{ empty, empty }";
+		if(c.length != 0)
+			if(c[0].getChannelNumber() == 1)
+				if(pStart.size() == 1)  
+					return "{ empty " +  ", " + pStart.get(0).getID() + "}";
+				else
+					return "{ " + pStart.get(0).getID() + ", " + "empty }";
+
+		if(pStart.size() >= 2)  return "{ " + pStart.get(0).getID() + ", " + pStart.get(1).getID() +" }";
+		
+		return "";
+		
 	}
 }
